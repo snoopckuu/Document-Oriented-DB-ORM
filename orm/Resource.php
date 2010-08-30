@@ -5,13 +5,17 @@ class Resource {
 	private $aModified = array(),$aAttributes = array();
 	private $sPK = null, $oService = null;
 	private $bIsNew = false;
+	
 	public function __construct( $sDomainName, $sPK = null){
 		
+		/* TODO: Adapter */
 		$this->service = new Amazon_SimpleDB_Client(AWS_ACCESS_KEY_ID, 
 	                                       			AWS_SECRET_ACCESS_KEY);
 	
 		$this->sDomain = $sDomainName;
-	
+		
+		/* TODO: Move PK to save method */
+		
 		if( is_null( $sPK ) ){
 			$this->sPK = uniqid();
 			$this->isNew = true;
@@ -22,40 +26,88 @@ class Resource {
 	
 	}
 	
+	/* Magic */
+	
 	public function __call($name, $arguments ){
 		
 		if( substr($name,0,3) == 'set' )
 			return $this->set(substr($name,3,strlen($name)),$arguments);
 		elseif( substr($name,0,3) == 'get' )
+			return $this->get(substr($name,3,strlen($name)));
+		elseif( substr($name,0,3) == 'add' )
 			return $this->get(substr($name,3,strlen($name)),$arguments);
 		else
 			throw new Exception('Method does not exist');
 	}
+	
+	/* get Attribute from resource modified one first, than populated */
 	
 	private function get( $sName ){
 		
 		$sName = strtolower($sName);
 		
 			if( isset( $this->aModified[$sName] ) )
-				return $this->aModified[$sName];
+				return $this->output( $this->aModified[$sName] );
 			elseif( isset( $this->aAttributes[$sName] ) )
-				return $this->aAttributes[$sName];
+				return $this->output( $this->aAttributes[$sName] );
 			else
 				return null;
 		
 	}
 	
-	private function set( $name, $arguments ){
+	/* Format output */
+	
+	private function output( $sString ){
+		
+		if( is_array( $sString ) && count( $sString ) == 1 )
+			return $sString[0];
+		else 
+			return $sString;
+		
+	}
+	
+	
+	
+	private function add( $name, $arguments ){
+		
+		$attributes = $this->getAttributes();
+		
+		if( !is_array( $arguments ) )
+			$arguments = array( $arguments );
 		
 		foreach( $arguments as $arg ){
+			if( is_array( $attributes[$name] ) ){
+				array_push($attributes[$name], $arg );
+				$this->aModified[$name] = $attributes[$name];
+			} elseif( isset($this->attributes[$name ] ) ){
+				
+			} else {
+				
+			}
+		}
+		return $this;
+		
+	}
+	
+	
+	
+	private function set( $name, $arguments ){
+		
+		$keys
+		foreach( $arguments as $arg ){
 			
-			$this->aModified[strtolower($name)] = $arg;
+			if( is_array( $arg ) )
+				$this->add( $name, $arg );
+			elseif( )
+				$this->aModified[strtolower($name)] = $arg;
 			
 		}
 		
 		return $this;
 	
 	}
+	
+	/* populate object with saved information from db TODO: Move to Adapter */
 	
 	public function populate(){
 		
@@ -86,11 +138,15 @@ class Resource {
 		
 	}
 	
+	/* return array of all attributes merge between saved & modified */
+	
 	public function getAttributes(){
 		
 		return array_merge($this->aAttributes, $this->aModified);
 		
 	}
+	
+	/* return array of modified attributes */ 
 	
 	public function getModifiedAttributes(){
 		
@@ -110,6 +166,8 @@ class Resource {
 		
 	}
 	
+	/* return primary key */
+	
 	public function getPK(){
 		
 		if( $this->sPK === null )
@@ -119,9 +177,12 @@ class Resource {
 		
 	}
 	
+	/* format array to Simpledb save format TODO: Move to adapter */
+	
 	private function format( array $aAttributes ){
 		
 		$aResult = array();
+		
 		foreach($aAttributes  as $name => $value ){
 			
 			$aResult[] = array ("Name" => $name, "Value" => $value);
@@ -131,6 +192,9 @@ class Resource {
 		return $aResult;
 		
 	}
+	
+	
+	/* Save object to db TODO: Move everuthis to adapter */
 	
 	public function save(){
 

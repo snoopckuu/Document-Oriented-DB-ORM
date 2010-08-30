@@ -9,7 +9,7 @@ $user = new User('4c798669f35ee');
 
 class TestOfModel extends UnitTestCase {
 	
-	 function testIsNew(){
+	 public function testIsNew(){
 		
 		$user = new User();
 		$this->assertTrue($user->isNew());

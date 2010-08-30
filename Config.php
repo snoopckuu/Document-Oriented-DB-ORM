@@ -1,19 +1,38 @@
 <?php
 
-    define('AWS_ACCESS_KEY_ID', '');
-    define('AWS_SECRET_ACCESS_KEY', '');  
+     function simpleDBautoload($className){
+        $className = 'vendor/'.str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
+		if( file_exists($className) )
+			include_once($className);
+		
+		return;
 
-
-    set_include_path(get_include_path() . PATH_SEPARATOR . '../vendor');    
-    
-     function __autoload($className){
-        $filePath = str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
-        $includePaths = explode(PATH_SEPARATOR, get_include_path());
-        foreach($includePaths as $includePath){
-            if(file_exists($includePath . DIRECTORY_SEPARATOR . $filePath)){
-                require_once $filePath;
-                return;
-            }
-        }
     }
-  
+
+	class Config {
+		
+		private static $instance = null;
+		private static $aSettings = null;
+		
+		private function __construct(){	
+			$yaml = new sfYamlParser();
+			self::$aSettings = $yaml->parse(file_get_contents('config/settings.yaml'));
+		}
+		
+		public static function getInstnace(){
+			if(self::$instance === null)
+				self::$instance = new Config();
+		}
+		
+		public static function get( $sKey ){
+			
+			var_dump( $self::$aSettings );
+			
+		}
+		
+	}
+
+	spl_autoload_register('simpleDBautoload');
+  	
+	Config::getInstnace();
+

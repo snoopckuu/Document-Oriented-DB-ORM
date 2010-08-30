@@ -2,7 +2,8 @@
 
 class SimpleDB extends Database {
 	
-		public function __construct(){
+		private function __construct(){
+			
 			$this->service = new Amazon_SimpleDB_Client(AWS_ACCESS_KEY_ID, 
 		                                       			AWS_SECRET_ACCESS_KEY);
 		}
