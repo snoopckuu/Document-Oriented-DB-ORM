@@ -1,15 +1,16 @@
-<?php 
+<?
 
-interface Database {
+class Database {
 	
-	 public function createResource();
-	 public function listResources();
-	 public function deleteResource();
+	private static $instance = null;
 	
-	 public function insertItem();
-	 public function deleteItem();
-	
-	 public function getAttributes();
-	 public function putAttributes();
+	public static function getInstance(){
+		if(self::$instance === null){
+			$adapter = ORMConfig::get('adapter');
+			self::$instance = new $adapter();
+		}
+		
+		return self::$instance;
+	}
 	
 }

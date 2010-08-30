@@ -1,38 +1,65 @@
 <?php
 
-     function simpleDBautoload($className){
-        $className = 'vendor/'.str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
-		if( file_exists($className) )
-			include_once($className);
+set_include_path(get_include_path() . PATH_SEPARATOR . 'vendor');
+	
+	function autoload($className){
+        $path = realpath('.').'/';
+		if(stristr($className,'Amazon')){
+			
+			$className = $path.'vendor/'.str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
+			if( file_exists($className) )
+				include_once($className);
+			return;
+			
+		}
+		
+		$className = $className.'.php';
+		if( file_exists($path.'vendor/yaml/'.$className) )
+			include_once($path.'vendor/yaml/'.$className);
+		elseif( file_exists($path.'orm/'.$className) )
+			include_once($path.'orm/'.$className);
+		elseif( file_exists($path.'model/'.$className) )
+			include_once($path.'model/'.$className);
+		elseif( file_exists($path.'adapters/'.$className) )
+			include_once($path.'adapters/'.$className);
 		
 		return;
 
     }
-
-	class Config {
+	
+	spl_autoload_register('autoload');
+	
+	class ORMConfig {
 		
 		private static $instance = null;
 		private static $aSettings = null;
 		
 		private function __construct(){	
 			$yaml = new sfYamlParser();
-			self::$aSettings = $yaml->parse(file_get_contents('config/settings.yaml'));
+			self::$aSettings = $yaml->parse(file_get_contents('config/settings.yml'));
 		}
 		
-		public static function getInstnace(){
+		public static function getInstance(){
 			if(self::$instance === null)
-				self::$instance = new Config();
+				self::$instance = new ORMConfig();
+			
+			return self::$instance;
 		}
 		
-		public static function get( $sKey ){
+		public static function get( $sKey, $sNamespace = false ){
 			
-			var_dump( $self::$aSettings );
-			
+			if( $sNamespace && isset(self::$aSettings[$sNamespace][$sKey]))
+				return self::$aSettings[$sNamespace][$sKey];
+			elseif( isset(self::$aSettings[$sKey]) )
+				return self::$aSettings[$sKey];
+			else 
+				return null;
 		}
 		
 	}
 
-	spl_autoload_register('simpleDBautoload');
-  	
-	Config::getInstnace();
+	ORMConfig::getInstance();
+	
+	$db = Database::getInstance();
+
 

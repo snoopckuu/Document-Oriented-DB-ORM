@@ -3,21 +3,18 @@
 class Resource {
 	
 	private $aModified = array(),$aAttributes = array();
-	private $sPK = null, $oService = null;
+	private $sPK = null, $db = null;
 	private $bIsNew = false;
 	
 	public function __construct( $sDomainName, $sPK = null){
 		
-		/* TODO: Adapter */
-		$this->service = new Amazon_SimpleDB_Client(AWS_ACCESS_KEY_ID, 
-	                                       			AWS_SECRET_ACCESS_KEY);
+		$this->db = Database::getInstance();
 	
 		$this->sDomain = $sDomainName;
 		
 		/* TODO: Move PK to save method */
 		
 		if( is_null( $sPK ) ){
-			$this->sPK = uniqid();
 			$this->isNew = true;
 		} else{
 			$this->sPK = $sPK;
@@ -30,12 +27,15 @@ class Resource {
 	
 	public function __call($name, $arguments ){
 		
-		if( substr($name,0,3) == 'set' )
-			return $this->set(substr($name,3,strlen($name)),$arguments);
-		elseif( substr($name,0,3) == 'get' )
-			return $this->get(substr($name,3,strlen($name)));
-		elseif( substr($name,0,3) == 'add' )
-			return $this->get(substr($name,3,strlen($name)),$arguments);
+		$value = strtolower(substr($name,3,strlen($name)));
+		$name = strtolower(substr($name,0,3));
+		
+		if( $name == 'set' )
+			return $this->set($value,$arguments);
+		elseif( $name == 'get' )
+			return $this->get($value);
+		elseif( $name == 'add' )
+			return $this->add($value,$arguments);
 		else
 			throw new Exception('Method does not exist');
 	}
@@ -43,8 +43,6 @@ class Resource {
 	/* get Attribute from resource modified one first, than populated */
 	
 	private function get( $sName ){
-		
-		$sName = strtolower($sName);
 		
 			if( isset( $this->aModified[$sName] ) )
 				return $this->output( $this->aModified[$sName] );
@@ -67,7 +65,6 @@ class Resource {
 	}
 	
 	
-	
 	private function add( $name, $arguments ){
 		
 		$attributes = $this->getAttributes();
@@ -76,15 +73,10 @@ class Resource {
 			$arguments = array( $arguments );
 		
 		foreach( $arguments as $arg ){
-			if( is_array( $attributes[$name] ) ){
 				array_push($attributes[$name], $arg );
 				$this->aModified[$name] = $attributes[$name];
-			} elseif( isset($this->attributes[$name ] ) ){
-				
-			} else {
-				
-			}
 		}
+		
 		return $this;
 		
 	}
@@ -93,48 +85,34 @@ class Resource {
 	
 	private function set( $name, $arguments ){
 		
-		$keys
+		$aKeys = array();
+		
 		foreach( $arguments as $arg ){
-			
-			if( is_array( $arg ) )
-				$this->add( $name, $arg );
-			elseif( )
-				$this->aModified[strtolower($name)] = $arg;
-			
+				
+				if( !in_array($name, $aKeys) ){
+					if( is_array( $arg ) )
+						$this->aModified[$name] = $arg;
+					else
+						$this->aModified[$name] = array($arg);
+					$aKeys[] = $name;
+				} else {
+					if( is_array( $arg ) ){
+						foreach( $arg as $a ){ array_push($this->aModified[$name], $a); }
+					} else
+						array_push($this->aModified[$name], $arg);
+				}
+				
 		}
 		
 		return $this;
 	
 	}
 	
-	/* populate object with saved information from db TODO: Move to Adapter */
+	/* populate object with saved information from db */
 	
 	public function populate(){
-		
-		$this->aAttributes = array();
-		
-		$response = $this->service->getAttributes(array ( "DomainName" =>  $this->sDomain,
-		            								 "ItemName" =>    $this->sPK ) );
-		
-		if ($response->isSetGetAttributesResult()) { 
-			
-			$getAttributesResult = $response->getGetAttributesResult();
-			$attributeList = $getAttributesResult->getAttribute();
-			
-			foreach ($attributeList as $attribute) {
-			
-			 if($attribute->isSetName() && $attribute->isSetValue()){
-				$this->aAttributes[$attribute->getName()] = $attribute->getValue();
-			 }
-			
-			}
-			
-			return true;
-		
-		} else 
-		
-			return false;
-				
+
+		$this->aAttributes = $this->db->retrieve($this->sDomain, $this->sPK );
 		
 	}
 	
@@ -170,43 +148,33 @@ class Resource {
 	
 	public function getPK(){
 		
-		if( $this->sPK === null )
-			throw new Exception('Primary key is null');
-		else
 			return $this->sPK;
-		
+			
 	}
 	
-	/* format array to Simpledb save format TODO: Move to adapter */
-	
-	private function format( array $aAttributes ){
+	public function clean(){
 		
-		$aResult = array();
-		
-		foreach($aAttributes  as $name => $value ){
-			
-			$aResult[] = array ("Name" => $name, "Value" => $value);
-			
-		}
-		
-		return $aResult;
+		$this->isNew = true;
+		$this->aModified = array();
+		$this->aAttributes = array();
+		$this->sPK = null;
 		
 	}
-	
-	
-	/* Save object to db TODO: Move everuthis to adapter */
 	
 	public function save(){
-
-		$action = array ( "DomainName" =>  $this->sDomain,
-		            "ItemName" =>    $this->sPK,
-		            "Attribute" =>  $this->format($this->getModifiedAttributes()),
-		            );
 		
-		$this->service->putAttributes($action);
+		if( count( $this->getModifiedAttributes() ) > 0){
+			if( is_null($this->sPK) )
+				$this->sPK = uniqid();
+			$this->db->save($this->sDomain,$this->sPK, $this->getModifiedAttributes());
+		}
+		
 		$this->isNew = false;
 		$this->aModified = array();
-		$this->populate();
+		
+			if($this->sPK)
+				$this->populate();
+		
 		return true;
 		
 	}

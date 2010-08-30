@@ -1,4 +1,4 @@
+adapter: SimpleDB
 amazon:
     access_key:
     secret_key:
-    
