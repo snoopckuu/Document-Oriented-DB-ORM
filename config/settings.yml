@@ -1,4 +1,13 @@
-adapter: SimpleDB
+orm:
+    strict: true
+    cache: memcache
+    adapter: SimpleDB
+    
+memcache:
+    host: 127.0.0.1
+    username: ~
+    password: ~
+
 amazon:
     access_key:
     secret_key:

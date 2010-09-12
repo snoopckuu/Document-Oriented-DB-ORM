@@ -6,7 +6,7 @@ class Database {
 	
 	public static function getInstance(){
 		if(self::$instance === null){
-			$adapter = ORMConfig::get('adapter');
+			$adapter = ORMConfig::get('adapter','orm');
 			self::$instance = new $adapter();
 		}
 		
