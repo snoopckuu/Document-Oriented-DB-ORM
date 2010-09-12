@@ -1,17 +1,3 @@
-ORM FOR SimpleDB
+Document Oriented ORM with adapters to MongoDB & Amazon SimpleDB.
 
-USAGE:
-
-$user = new User();
-$user->setName('daniel')->setPassword('test')->save();
-var_dump($user->getPK());
-var_dump($user->isNew());
-var_dump($user->isModified());
-var_dump($user->getAttributes());
-var_dump($user->getModifiedAttributes());
-$user->save();
-var_dump($user->getPK());
-var_dump($user->isNew());
-var_dump($user->isModified());
-var_dump($user->getAttributes());
-var_dump($user->getModifiedAttributes());
+Read WIKI for more information

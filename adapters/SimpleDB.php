@@ -58,7 +58,7 @@ class SimpleDB implements DatabaseInterface {
 			
 		}
 
-		public function query( $sQuery ){
+		public function query( $sQuery, $bOne = false ){
 			
 			$aResult = array();	
 			$response = $this->service->select(array( 'SelectExpression' => $sQuery ) );
@@ -83,7 +83,7 @@ class SimpleDB implements DatabaseInterface {
 	                    }
 			  }
 			
-			return $aResult;
+			return ( $bOne ) ? $aResult[0] : $aResult;
 			
 		}
 		
