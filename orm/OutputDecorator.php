@@ -23,6 +23,7 @@ class OutputDecorator implements IteratorAggregate
 	// TODO: implemet this
 	public function toArray(){}
 	public function toObject(){}
+	public function toXML(){}
 	
 	
 }

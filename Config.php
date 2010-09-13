@@ -28,7 +28,7 @@ set_include_path(get_include_path() . PATH_SEPARATOR . 'vendor');
     }
 	
 	spl_autoload_register('autoload');
-	
+			
 	class ORMConfig {
 		
 		private static $instance = null;
@@ -60,6 +60,6 @@ set_include_path(get_include_path() . PATH_SEPARATOR . 'vendor');
 
 	ORMConfig::getInstance();
 
-						 
-
+	$user = User::retrieveByPK('4c7985f775603');			 
+	var_dump(Query::create()->from('User')->fetchAll());
 

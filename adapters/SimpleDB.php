@@ -146,7 +146,16 @@ class SimpleDB implements DatabaseInterface {
 		
 	 } 
 	
-
+	 public function fetchOne( Query $query ){
+		$sSql = new SqlBuilder( $query->limit(1) );
+		return $this->Query( $sSql, true );
+	 }
+	
+	 public function fetchAll( Query $query ){
 		
+		$sSql = new SqlBuilder( $query );
+		return $this->Query( $sSql );
+		
+	 }
 
 }

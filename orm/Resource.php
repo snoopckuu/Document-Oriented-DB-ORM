@@ -6,11 +6,12 @@ class Resource {
 	private $sPK = null, $db = null;
 	private $bIsNew = false;
 	
-	public function __construct( $sDomainName, $sPK = null){
+	public function __construct( $sPK = null, $sDomainName = null, $bPopulate = true){
 		
 		$this->db = Database::getInstance();
-	
-		$this->sDomain = $sDomainName;
+		
+		if( is_null($sDomainName) )
+			$this->sDomain = get_class($this);
 		
 		/* TODO: Move PK to save method */
 		
@@ -18,7 +19,8 @@ class Resource {
 			$this->isNew = true;
 		} else{
 			$this->sPK = $sPK;
-			$this->populate();
+			if($bPopulate)
+				$this->populate();
 		}
 	
 	}
@@ -118,9 +120,25 @@ class Resource {
 	
 	/* return array of all attributes merge between saved & modified */
 	
-	public function getAttributes(){
+	public function toArray(){
 		
 		return array_merge($this->aAttributes, $this->aModified);
+		
+	}
+	
+	public function toObject(){
+		
+		$object = new stdClass;
+		
+		$aAttribbutes = $this->toArray();
+		
+			foreach($aAttribbutes as $key => $value ){
+				
+				$object->$key = $value;
+				
+			}
+			
+		return $object;
 		
 	}
 	
@@ -150,6 +168,22 @@ class Resource {
 		
 			return $this->sPK;
 			
+	}
+	
+	// TODO: PHP 5.2
+
+	public static function query(){
+		
+		return Query::create()->from( get_called_class( ) ); 
+		
+	}
+	
+	public static function retrieveByPk( $sPK ){
+		
+		$sModelName = get_called_class( );
+		die('asd'. $sModelName);
+		return new $sModelName( $sPK );
+		
 	}
 	
 	public function clean(){

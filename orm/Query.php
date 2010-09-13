@@ -6,14 +6,14 @@
 class Query
 {
 	private $db = null;
-	private $sFrom = null;
-	private $aWhere = array();
-	private $aOrWhere = array();
-	private $sSelect = '*';
-	private $sLimit = null;
-	private $sOffset = null;
-	private $aGroupBy = array();
-	private $sOrderBy = null;
+	public $sFrom = null;
+	public $aWhere = array();
+	public $aOrWhere = array();
+	public $sSelect = '*';
+	public $sLimit = null;
+	public $sOffset = null;
+	public $aGroupBy = array();
+	public $sOrderBy = null;
 	
 	public function __construct( $connection = null ){
 		$this->db = Database::getInstance(); 
@@ -82,45 +82,23 @@ class Query
 		
 	}
 	
-	private function buildSql( $bLimit = false ){
+	public function toSql(){
 		
-		$sSql = "SELECT ";
-		$sSql .= $this->sSelect;
-		if( is_null( $this->sFrom ) ) 
-			throw new Exception('You need to specify FROM parameter');
-		$sSql .= " FROM ". $this->sFrom;
-		if( !empty( $this->aWhere ) or !empty($this->aOrWhere) ){
-			$sSql .= " WHERE ".implode(' AND ', $this->aWhere );
-			$sSql .= (!empty($this->aWhere)) ? ' OR ' : '';
-			$sSql .= implode(' OR ', $this->aOrWhere );
-		}
-		if( !is_null($this->sOrderBy ) )
-			$sSql .= " ORDER BY ".$this->sOrderBy;
-		if( !is_null($this->sLimit) OR $bLimit )
-			$sSql .= " LIMIT ";
-			$sSql .= ( $bLimit ) ? 1 : $this->sLimit;
-		
-		return $sSql;
-		 
+		return new SqlBuilder( $this );
 		
 	}
-	
+
 	// TODO: Output decorator here.
-	// TODO: Adapters
 	
 	public function fetchAll(){
 		
-		 $sSql = $this->buildSql();
-		
-		 return $this->db->Query($sSql);
+		 return $this->db->fetchAll($this);
 		
 	}
 	
 	public function fetchOne(){
-		
-		 $sSql = $this->buildSql(true);
 		 
-		 return $this->db->Query($sSql, true);
+		 return $this->db->fetchOne($this);
 		
 	}
 	
