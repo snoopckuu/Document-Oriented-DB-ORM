@@ -1,7 +1,7 @@
 orm:
     strict: true
     cache: memcache
-    adapter: SimpleDB
+    adapter: MongoDB
     
 memcache:
     host: 127.0.0.1
@@ -11,3 +11,10 @@ memcache:
 amazon:
     access_key: 
     secret_key: 
+
+mongodb:
+     host: ~
+     port: ~
+     database: test
+     username: ~
+     password: ~

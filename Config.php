@@ -1,5 +1,6 @@
 <?php
 
+// TODO: Completely overwrite autoload and deleter this file.
 set_include_path(get_include_path() . PATH_SEPARATOR . 'vendor');
 	
 	function autoload($className){
@@ -12,7 +13,7 @@ set_include_path(get_include_path() . PATH_SEPARATOR . 'vendor');
 			return;
 			
 		}
-		
+		$className = str_replace('Adapter','',$className);
 		$className = $className.'.php';
 		if( file_exists($path.'vendor/yaml/'.$className) )
 			include_once($path.'vendor/yaml/'.$className);
@@ -59,7 +60,6 @@ set_include_path(get_include_path() . PATH_SEPARATOR . 'vendor');
 	}
 
 	ORMConfig::getInstance();
+	
 
-	$user = User::retrieveByPK('4c7985f775603');			 
-	var_dump(Query::create()->from('User')->fetchAll());
 

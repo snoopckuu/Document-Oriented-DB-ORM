@@ -1,6 +1,6 @@
 <?php
 
-class SimpleDB implements DatabaseInterface {
+class SimpleDBAdapter implements DatabaseInterface {
 	
 		public function __construct(){
 			
