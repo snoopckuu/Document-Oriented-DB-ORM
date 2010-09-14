@@ -12,9 +12,7 @@ class Resource {
 		
 		if( is_null($sDomainName) )
 			$this->sDomain = get_class($this);
-		
-		/* TODO: Move PK to save method */
-		
+	
 		if( is_null( $sPK ) ){
 			$this->isNew = true;
 		} else{
@@ -181,7 +179,6 @@ class Resource {
 	public static function retrieveByPk( $sPK ){
 		
 		$sModelName = get_called_class( );
-		die('asd'. $sModelName);
 		return new $sModelName( $sPK );
 		
 	}
@@ -195,12 +192,16 @@ class Resource {
 		
 	}
 	
+	public function delete(){
+		
+		return $this->db->delete($this->sDomain,$this->sPK);
+		
+	}
+	
 	public function save(){
 		
 		if( count( $this->getModifiedAttributes() ) > 0){
-			if( is_null($this->sPK) )
-				$this->sPK = uniqid();
-			$this->db->save($this->sDomain,$this->sPK, $this->getModifiedAttributes());
+			$this->sPK = $this->db->save($this->sDomain,$this->sPK, $this->getModifiedAttributes());
 		}
 		
 		$this->isNew = false;

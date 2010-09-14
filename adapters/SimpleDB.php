@@ -141,8 +141,10 @@ class SimpleDBAdapter implements DatabaseInterface {
 		            "ItemName" => $sPk,
 		            "Attribute" =>  $this->format($aArguments),
 		            );
-		
-		return $this->service->putAttributes($action);
+		if($this->service->putAttributes($action))
+			return $sPk;
+		else
+			return false;
 		
 	 } 
 	
@@ -156,6 +158,11 @@ class SimpleDBAdapter implements DatabaseInterface {
 		$sSql = new SqlBuilder( $query );
 		return $this->Query( $sSql );
 		
+	 }
+	 
+	 // TODO: IMPLEMENT ME
+	 public function delete( $sDomain,$sPk ){
+		return false;
 	 }
 
 }

@@ -15,6 +15,6 @@ amazon:
 mongodb:
      host: ~
      port: ~
-     database: test
+     database: orm
      username: ~
      password: ~
