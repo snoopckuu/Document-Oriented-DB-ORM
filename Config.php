@@ -4,7 +4,7 @@
 set_include_path(get_include_path() . PATH_SEPARATOR . 'vendor');
 	
 	function autoload($className){
-        $path = realpath('.').'/';
+        $path = realpath(__DIR__).'/';
 		if(stristr($className,'Amazon')){
 			
 			$className = $path.'vendor/'.str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
@@ -60,12 +60,4 @@ set_include_path(get_include_path() . PATH_SEPARATOR . 'vendor');
 	}
 
 	ORMConfig::getInstance();
-
-	$user = new User();
-	$user->setVasya('asd','vasya');
-	$user->save();
-
-	
-	
-	var_dump(User::retrieveByPk($user->getPK())->delete());
 

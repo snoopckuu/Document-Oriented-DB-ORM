@@ -137,6 +137,8 @@ class SimpleDBAdapter implements DatabaseInterface {
 	 
 	 public function save( $sDomain, $sPk, array $aArguments ){
 
+		if(is_null($sPk))
+			$sPk = uniqid();
 		$action = array ( "DomainName" =>  $sDomain,
 		            "ItemName" => $sPk,
 		            "Attribute" =>  $this->format($aArguments),

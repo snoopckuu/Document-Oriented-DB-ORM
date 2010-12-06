@@ -12,5 +12,5 @@ interface DatabaseInterface {
 	 public function fetchOne(Query $query);
 	
 	 public function save($sDomain,$sPk, array $aAttributes);
-     public function delete($sDomain,$sPk);
+	 public function delete($sDomain,$sPk);
 }

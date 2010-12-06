@@ -30,7 +30,13 @@ class MongoDBAdapter implements DatabaseInterface {
 	 //FIXME: IMPLEMENT ME 
 	
 	 public function fetchAll(Query $query){
-		return array();
+		$q = new MongoQueryBuilder( $query );
+		$result = $this->service->selectCollection($query->sFrom)->find($q->buildQuery());
+		$aResult = array();
+			while( $result->hasNext() ) {
+				$aResult[] = $result->getNext();
+			}
+		return $aResult;
 	 }
 	 public function fetchOne(Query $query){
 		return array();
