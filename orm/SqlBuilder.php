@@ -6,6 +6,12 @@
 class SqlBuilder extends QueryBuilder
 {
 	
+	public function __toString(){
+		
+		return $this->buildQuery();
+		
+	}
+	
 	private function buildQuery( $bLimit = false ){
 		
 		$sSql = "SELECT ";

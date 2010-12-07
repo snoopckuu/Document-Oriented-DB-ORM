@@ -1,7 +1,7 @@
 orm:
     strict: true
     cache: memcache
-    adapter: MongoDB
+    adapter: SimpleDB
     
 memcache:
     host: 127.0.0.1

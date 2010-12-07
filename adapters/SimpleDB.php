@@ -83,7 +83,7 @@ class SimpleDBAdapter implements DatabaseInterface {
 	                    }
 			  }
 			
-			return ( $bOne ) ? $aResult[0] : $aResult;
+			return ( $bOne ) ? $aResult[0] : new Collection( $aResult );
 			
 		}
 		
@@ -93,7 +93,8 @@ class SimpleDBAdapter implements DatabaseInterface {
 			
 			$response = $this->service->getAttributes(array ( "DomainName" =>  $sDomain,
 			            								 "ItemName" =>    $sPK ) );
-
+			$aResult['_PK'] = $sPK;										
+		
 			if ($response->isSetGetAttributesResult()) { 
 
 				$getAttributesResult = $response->getGetAttributesResult();
@@ -113,7 +114,7 @@ class SimpleDBAdapter implements DatabaseInterface {
 				}
 
 				}
-
+				// TODO: HYDRATE $aResult = $sDomain::hydrate($aResult);
 				return $aResult;
 
 			} else 
@@ -162,9 +163,9 @@ class SimpleDBAdapter implements DatabaseInterface {
 		
 	 }
 	 
-	 // TODO: IMPLEMENT ME
 	 public function delete( $sDomain,$sPk ){
-		return false;
+		return $this->service->deleteAttributes(array ( "DomainName" =>  $sDomain,
+		            "ItemName" => $sPk, "Attribute" => array()));
 	 }
 
 }

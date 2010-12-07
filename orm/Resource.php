@@ -1,6 +1,6 @@
 <?php
 
-class Resource {
+class Resource implements ArrayAccess {
 	
 	private $aModified = array(),$aAttributes = array();
 	private $sPK = null, $db = null;
@@ -17,7 +17,7 @@ class Resource {
 			$this->isNew = true;
 		} else{
 			$this->sPK = $sPK;
-			if($bPopulate)
+			if($bPopulate === true)
 				$this->populate();
 		}
 	
@@ -40,10 +40,31 @@ class Resource {
 			throw new Exception('Method does not exist');
 	}
 	
+	public function offsetSet($offset, $value) {
+		if (is_null($offset)) {
+			$this->aModified[] = $value;
+		} else {
+			$this->aModified[$offset] = $value;
+	    }
+	}
+	
+	public function offsetExists($offset) {
+		return isset($this->aModified[$offset]);
+	}
+	
+	public function offsetUnset($offset) {
+		unset($this->aModified[$offset]);
+	}
+	
+	public function offsetGet($offset) {
+		return isset($this->aModified[$offset]) ? $this->output($this->aModified[$offset]) : null;
+	}
+	
 	/* get Attribute from resource modified one first, than populated */
 	
 	private function get( $sName ){
 		
+			$sName = strtolower($sName);
 			if( isset( $this->aModified[$sName] ) )
 				return $this->output( $this->aModified[$sName] );
 			elseif( isset( $this->aAttributes[$sName] ) )
@@ -67,14 +88,23 @@ class Resource {
 	
 	private function add( $name, $arguments ){
 		
-		$attributes = $this->getAttributes();
-		
-		if( !is_array( $arguments ) )
-			$arguments = array( $arguments );
+		$aKeys = array($name);
 		
 		foreach( $arguments as $arg ){
-				array_push($attributes[$name], $arg );
-				$this->aModified[$name] = $attributes[$name];
+				
+				if( !in_array($name, $aKeys) ){
+					if( is_array( $arg ) )
+						$this->aModified[$name] = $arg;
+					else
+						$this->aModified[$name] = array($arg);
+					$aKeys[] = $name;
+				} else {
+					if( is_array( $arg ) ){
+						foreach( $arg as $a ){ array_push($this->aModified[$name], $a); }
+					} else
+						array_push($this->aModified[$name], $arg);
+				}
+				
 		}
 		
 		return $this;
@@ -174,6 +204,11 @@ class Resource {
 		
 		return Query::create()->from( get_called_class( ) ); 
 		
+	}
+	
+	public static function hydrate(array $aFields){
+		$class = get_called_class( );
+		return new $class($aFields['_PK'],$class,$aFields);
 	}
 	
 	public static function retrieveByPk( $sPK ){
