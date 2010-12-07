@@ -27,7 +27,7 @@ class Resource implements ArrayAccess {
 	
 	public function __call($name, $arguments ){
 		
-		$value = strtolower(substr($name,3,strlen($name)));
+		$value = $this->formatLabel(substr($name,3,strlen($name)));
 		$name = strtolower(substr($name,0,3));
 		
 		if( $name == 'set' )
@@ -116,7 +116,6 @@ class Resource implements ArrayAccess {
 	private function set( $name, $arguments ){
 		
 		$aKeys = array();
-		
 		foreach( $arguments as $arg ){
 				
 				if( !in_array($name, $aKeys) ){
@@ -137,6 +136,12 @@ class Resource implements ArrayAccess {
 		return $this;
 	
 	}
+	
+	private function formatLabel( $sLabel ) {
+    	$sLabel[0] = strtolower($sLabel[0]);
+    	$func = create_function('$c', 'return "_" . strtolower($c[1]);');
+    	return preg_replace_callback('/([A-Z])/', $func, $sLabel);
+  	}
 	
 	/* populate object with saved information from db */
 	

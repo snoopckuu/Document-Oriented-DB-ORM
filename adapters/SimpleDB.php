@@ -5,7 +5,8 @@ class SimpleDBAdapter implements DatabaseInterface {
 		public function __construct(){
 			
 			$this->service = new Amazon_SimpleDB_Client(ORMConfig::get('access_key','amazon'), 
-		                                       			ORMConfig::get('secret_key','amazon'));
+		                                       			ORMConfig::get('secret_key','amazon'),
+														array('Timeout' => ORMConfig::get('timeout','amazon')));
 		}
 
 		public function createDomain( $sName ){

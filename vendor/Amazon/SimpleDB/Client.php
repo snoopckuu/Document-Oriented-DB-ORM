@@ -65,7 +65,8 @@ class Amazon_SimpleDB_Client implements Amazon_SimpleDB_Interface
                                'SignatureMethod' => 'HmacSHA256',
                                'ProxyHost' => null,
                                'ProxyPort' => -1,
-                               'MaxErrorRetry' => 3
+                               'MaxErrorRetry' => 3,
+							   'Timeout' => 10,
                                );
 
     /**
@@ -482,7 +483,7 @@ class Amazon_SimpleDB_Client implements Amazon_SimpleDB_Interface
         }
 
         $response = '';
-        if ($socket = @fsockopen($scheme . $url['host'], $port, $errno, $errstr, 10)) {
+        if ($socket = @fsockopen($scheme . $url['host'], $port, $errno, $errstr, (isset($this->_config['Timeout'])) ? $this->_config['Timeout'] : 10 )) {
 
             fwrite($socket, $post);
 
