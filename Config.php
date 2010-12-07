@@ -61,7 +61,4 @@ set_include_path(get_include_path() . PATH_SEPARATOR . 'vendor');
 
 	ORMConfig::getInstance();
 	
-	$user = new User();
-	$user->setName('test');
-	
 

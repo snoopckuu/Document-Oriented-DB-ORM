@@ -83,7 +83,7 @@ class SimpleDBAdapter implements DatabaseInterface {
 	                    }
 			  }
 			
-			return ( $bOne ) ? $aResult[0] : new Collection( $aResult );
+			return ( $bOne ) ? $aResult[0] : $aResult;
 			
 		}
 		

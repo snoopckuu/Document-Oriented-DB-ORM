@@ -88,11 +88,10 @@ class Query
 		
 	}
 
-	// TODO: Output decorator here.
 	
 	public function fetchAll(){
 		
-		 return $this->db->fetchAll($this);
+		 return new Collection($this->db->fetchAll($this));
 		
 	}
 	
