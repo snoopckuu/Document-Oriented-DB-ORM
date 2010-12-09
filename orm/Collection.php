@@ -1,9 +1,15 @@
 <?php
 
-class Collection {
+class Collection implements IteratorAggregate {
+
+   	private $aCollection = array();
+
+  	public function getIterator() {
+
+    	return new ArrayIterator($this->aCollection);
 	
-	private $aCollection = array();
-	
+   	}
+
 	public function __construct(array $aResults){
 		
 		$this->aCollection = $aResults;

@@ -1,7 +1,7 @@
 <?php
 
 // TODO: Completely overwrite autoload and deleter this file.
-set_include_path(get_include_path() . PATH_SEPARATOR . 'vendor');
+set_include_path(get_include_path() . PATH_SEPARATOR . __DIR__ .'/vendor');
 	
 	function autoload($className){
         $path = realpath(__DIR__).'/';
@@ -37,7 +37,7 @@ set_include_path(get_include_path() . PATH_SEPARATOR . 'vendor');
 		
 		private function __construct(){	
 			$yaml = new sfYamlParser();
-			self::$aSettings = $yaml->parse(file_get_contents('config/settings.yml'));
+			self::$aSettings = $yaml->parse(file_get_contents(__DIR__.'/config/settings.yml'));
 		}
 		
 		public static function getInstance(){
@@ -61,4 +61,5 @@ set_include_path(get_include_path() . PATH_SEPARATOR . 'vendor');
 
 	ORMConfig::getInstance();
 	
-
+	
+	

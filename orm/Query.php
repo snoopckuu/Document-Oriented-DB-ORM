@@ -38,6 +38,10 @@ class Query
 		return $this;
 	}
 	
+	public function getModel(){
+		return $this->sFrom;
+	}
+	
 	public function from( $sQuery ){
 		
 		$this->sFrom = $sQuery;

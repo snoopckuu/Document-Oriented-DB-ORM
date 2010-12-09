@@ -59,11 +59,13 @@ class SimpleDBAdapter implements DatabaseInterface {
 			
 		}
 
-		public function query( $sQuery, $bOne = false ){
+		public function query( $oQuery, $bOne = false ){
 			
+			$sSql = new SqlBuilder( $oQuery );
 			$aResult = array();	
-			$response = $this->service->select(array( 'SelectExpression' => $sQuery ) );
-
+			$response = $this->service->select(array( 'SelectExpression' => $sSql ) );
+			
+			$model = $oQuery->getModel();
 	        
 			  if ($response->isSetSelectResult()) { 
 	                    $selectResult = $response->getSelectResult();
@@ -80,7 +82,9 @@ class SimpleDBAdapter implements DatabaseInterface {
 								else
 									$res[$attribute->getName()] = $attribute->getValue();
 	                        }
-							$aResult[] = $res;
+							$object = new $model();
+							$object->populate($res);
+							$aResult[] = $object;
 	                    }
 			  }
 			
@@ -115,7 +119,7 @@ class SimpleDBAdapter implements DatabaseInterface {
 				}
 
 				}
-				// TODO: HYDRATE $aResult = $sDomain::hydrate($aResult);
+				
 				return $aResult;
 
 			} else 
@@ -153,14 +157,15 @@ class SimpleDBAdapter implements DatabaseInterface {
 	 } 
 	
 	 public function fetchOne( Query $query ){
-		$sSql = new SqlBuilder( $query->limit(1) );
+
+		$query->limit(1);
 		return $this->Query( $sSql, true );
+
 	 }
 	
 	 public function fetchAll( Query $query ){
 		
-		$sSql = new SqlBuilder( $query );
-		return $this->Query( $sSql );
+		return $this->Query( $query );
 		
 	 }
 	 

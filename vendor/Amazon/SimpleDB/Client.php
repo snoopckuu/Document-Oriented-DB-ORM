@@ -483,7 +483,7 @@ class Amazon_SimpleDB_Client implements Amazon_SimpleDB_Interface
         }
 
         $response = '';
-        if ($socket = @fsockopen($scheme . $url['host'], $port, $errno, $errstr, (isset($this->_config['Timeout'])) ? $this->_config['Timeout'] : 10 )) {
+        if ($socket = @fsockopen($scheme . $url['host'], $port, $errno, $errstr, $this->_config['Timeout'] )) {
 
             fwrite($socket, $post);
 

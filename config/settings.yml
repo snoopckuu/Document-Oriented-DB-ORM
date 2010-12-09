@@ -11,7 +11,7 @@ memcache:
 amazon:
     access_key: 
     secret_key: 
-    timeout: 50
+    timeout: 5
 
 mongodb:
      host: ~

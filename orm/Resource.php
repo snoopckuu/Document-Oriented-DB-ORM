@@ -33,7 +33,7 @@ class Resource implements ArrayAccess {
 		if( $name == 'set' )
 			return $this->set($value,$arguments);
 		elseif( $name == 'get' )
-			return $this->get($value);
+			return $this->get($value,$arguments);
 		elseif( $name == 'add' )
 			return $this->add($value,$arguments);
 		else
@@ -62,25 +62,28 @@ class Resource implements ArrayAccess {
 	
 	/* get Attribute from resource modified one first, than populated */
 	
-	private function get( $sName ){
-		
-			$sName = strtolower($sName);
-			if( isset( $this->aModified[$sName] ) )
-				return $this->output( $this->aModified[$sName] );
-			elseif( isset( $this->aAttributes[$sName] ) )
-				return $this->output( $this->aAttributes[$sName] );
-			else
-				return null;
+	private function get( $sName, $aAttributes ){
+			
+			$sFormat = isset($aAttributes[0]) ? $aAttributes[0] : null;
+			
+			$sResult = isset( $this->aModified[$sName] ) ? $this->aModified[$sName] : $this->aAttributes[$sName];
+			
+			return (!is_null($sResult)) ? $this->output( $this->aAttributes[$sName], $sFormat ) : null;
 		
 	}
 	
-	/* Format output */
+	/* 
+	 * Format output 
+	 * TODO: OutputDecorator
+	*/
 	
-	private function output( $sString ){
+	private function output( $sString, $sFormat = null ){
 		
 		if( is_array( $sString ) && count( $sString ) == 1 )
 			return $sString[0];
-		else 
+		elseif(is_array($sString) && !is_null($sFormat))
+			return implode($sFormat,$sString);
+		else
 			return $sString;
 		
 	}
@@ -145,9 +148,12 @@ class Resource implements ArrayAccess {
 	
 	/* populate object with saved information from db */
 	
-	public function populate(){
-
-		$this->aAttributes = $this->db->retrieve($this->sDomain, $this->sPK );
+	public function populate( $aAttributes = null ){
+		
+		if(is_null($aAttributes))
+			$this->aAttributes = $this->db->retrieve($this->sDomain, $this->sPK );
+		else 
+			$this->aAttributes = $aAttributes;
 		
 	}
 	
