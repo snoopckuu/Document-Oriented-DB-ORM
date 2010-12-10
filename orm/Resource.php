@@ -174,6 +174,10 @@ class Resource implements ArrayAccess {
 		
 	}
 	
+	public function toJson(){
+		return json_encode($this->toArray());
+	}
+	
 	/* return array of modified attributes */ 
 	
 	public function getModifiedAttributes(){

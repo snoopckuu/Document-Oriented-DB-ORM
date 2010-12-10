@@ -158,8 +158,8 @@ class SimpleDBAdapter implements DatabaseInterface {
 	
 	 public function fetchOne( Query $query ){
 
-		$query->limit(1);
-		return $this->Query( $sSql, true );
+		$query->setLimit(1);
+		return $this->Query( $query, true );
 
 	 }
 	
