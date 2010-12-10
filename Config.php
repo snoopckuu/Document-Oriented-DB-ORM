@@ -58,8 +58,32 @@ set_include_path(get_include_path() . PATH_SEPARATOR . __DIR__ .'/vendor');
 		}
 		
 	}
+	
+	class Schema {
+		
+		private static $instance = null;
+		private static $aSettings = null;
+		
+		private function __construct(){	
+			$yaml = new sfYamlParser();
+			self::$aSettings = $yaml->parse(file_get_contents(__DIR__.'/config/schema.yml'));
+		}
+		
+		public static function getInstance(){
+			if(self::$instance === null)
+				self::$instance = new Schema();
+			
+			return self::$instance;
+		}
+		
+		public static function get( $sSchema, $sModel, $sField ){
+
+				return ( isset(self::$aSettings[$sSchema][$sModel][$sField]) ) ? self::$aSettings[$sSchema][$sModel][$sField] : null;
+
+		}
+		
+	}
 
 	ORMConfig::getInstance();
-	
-	
+	Schema::getInstance();
 	

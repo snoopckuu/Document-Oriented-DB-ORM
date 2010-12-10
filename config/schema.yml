@@ -1,0 +1,4 @@
+default:
+    User:
+        name: {}
+        created_at: { type: datetime }

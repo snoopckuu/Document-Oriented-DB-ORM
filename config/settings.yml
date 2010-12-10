@@ -2,6 +2,9 @@ orm:
     strict: true
     cache: memcache
     adapter: SimpleDB
+    date_format: Y-m-d H:i:s
+    escaping: true
+    schema: default
     
 memcache:
     host: 127.0.0.1

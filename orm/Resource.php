@@ -30,6 +30,11 @@ class Resource implements ArrayAccess {
 		$value = $this->formatLabel(substr($name,3,strlen($name)));
 		$name = strtolower(substr($name,0,3));
 		
+		if(ORMConfig::get('strict','orm')){
+			if(!is_array(Schema::get(ORMConfig::get('schema','orm'),$this->sDomain,$value)))
+				throw new Exception($value. ' was not found in schema');
+		}
+		
 		if( $name == 'set' )
 			return $this->set($value,$arguments);
 		elseif( $name == 'get' )
@@ -57,7 +62,7 @@ class Resource implements ArrayAccess {
 	}
 	
 	public function offsetGet($offset) {
-		return isset($this->aModified[$offset]) ? $this->output($this->aModified[$offset]) : null;
+		return isset($this->aModified[$offset]) ? new OutputDecorator( $this->aModified[$offset] ) : null;
 	}
 	
 	/* get Attribute from resource modified one first, than populated */
@@ -66,28 +71,16 @@ class Resource implements ArrayAccess {
 			
 			$sFormat = isset($aAttributes[0]) ? $aAttributes[0] : null;
 			
-			$sResult = isset( $this->aModified[$sName] ) ? $this->aModified[$sName] : $this->aAttributes[$sName];
-			
-			return (!is_null($sResult)) ? $this->output( $this->aAttributes[$sName], $sFormat ) : null;
+			if(isset( $this->aAttributes[$sName] ))
+				$sResult = $this->aAttributes[$sName];
+			elseif(isset( $this->aModified[$sName] ))
+				$sResult = $this->aModified[$sName];
+			else
+				$sResult = null;
+				
+			return (!is_null($sResult)) ? new OutputDecorator( $this->aAttributes[$sName], $sFormat ) : null;
 		
 	}
-	
-	/* 
-	 * Format output 
-	 * TODO: OutputDecorator
-	*/
-	
-	private function output( $sString, $sFormat = null ){
-		
-		if( is_array( $sString ) && count( $sString ) == 1 )
-			return $sString[0];
-		elseif(is_array($sString) && !is_null($sFormat))
-			return implode($sFormat,$sString);
-		else
-			return $sString;
-		
-	}
-	
 	
 	private function add( $name, $arguments ){
 		
