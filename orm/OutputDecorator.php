@@ -94,6 +94,10 @@ class OutputDecorator implements IteratorAggregate, ArrayAccess
 		return $this->input;
 	}
 	
+	public function isArray(){
+		return is_array($this->input);
+	}
+	
 	// TODO: IMPLEMENT
 	public function toXML(){}
 	
